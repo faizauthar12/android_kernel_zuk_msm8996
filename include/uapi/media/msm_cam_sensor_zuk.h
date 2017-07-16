@@ -1,6 +1,12 @@
-#ifdef CONFIG_ZUK_CAMERA
-#include <uapi/media/msm_cam_sensor_zuk.h>
-#else
+#ifndef __UAPI_LINUX_MSM_CAM_SENSOR_H
+#define __UAPI_LINUX_MSM_CAM_SENSOR_H
+
+#include <linux/v4l2-mediabus.h>
+#include <media/msm_camsensor_sdk.h>
+
+#include <linux/types.h>
+#include <linux/i2c.h>
+
 #define I2C_SEQ_REG_SETTING_MAX   5
 
 #define MSM_SENSOR_MCLK_8HZ   8000000
@@ -296,7 +302,7 @@ struct msm_eeprom_cfg_data {
 	enum eeprom_cfg_type_t cfgtype;
 	uint8_t is_supported;
 	union {
-		char eeprom_name[MAX_EEPROM_NAME];
+		char eeprom_name[MAX_SENSOR_NAME];
 		struct eeprom_get_t get_data;
 		struct eeprom_read_t read_data;
 		struct eeprom_write_t write_data;
@@ -336,6 +342,8 @@ enum msm_sensor_cfg_type_t {
 	CFG_WRITE_I2C_ARRAY_ASYNC,
 	CFG_WRITE_I2C_ARRAY_SYNC,
 	CFG_WRITE_I2C_ARRAY_SYNC_BLOCK,
+	CFG_RELEASE_CCI,
+	CFG_INIT_CCI
 };
 
 enum msm_actuator_cfg_type_t {
@@ -599,3 +607,4 @@ struct sensor_init_cfg_data {
 	_IOWR('V', BASE_VIDIOC_PRIVATE + 15, struct msm_ir_cut_cfg_data_t)
 
 #endif
+
