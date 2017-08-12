@@ -1,0 +1,8 @@
+&pmi8994_haptics {
+	qcom,actuator-type = "erm";
+	qcom,vmax-mv = <3200>;
+	qcom,wave-shape = "square";
+	//qcom,wave-play-rate-us = <5263>;//0~20475
+	qcom,ilim-ma = <105>;
+	qcom,int-pwm-freq-khz = <253>;//lowest:253Khz
+};

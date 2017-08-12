@@ -1,0 +1,78 @@
+#include "dsi-panel-samsung-1080p-cmd.dtsi"
+#include "dsi-panel-tianma-1080p-video.dtsi"
+#include "dsi-panel-tianma-ft8716-1080p-video.dtsi"
+#include "dsi-panel-boe-td4300-1080p-video.dtsi"
+
+&mdss_dsi1 {
+	compatible = "qcom,mdss-dsi-ctrl-notuse";
+};
+
+&dsi_panel_pwr_supply {
+	qcom,panel-supply-entry@0 {
+		qcom,supply-post-on-sleep = <1>;
+		qcom,supply-pre-off-sleep = <3>;
+	};
+	
+	qcom,panel-supply-entry@2 {
+		qcom,supply-post-on-sleep = <1>;
+		qcom,supply-pre-off-sleep = <1>;
+	};
+};
+
+&spi_0{
+	status = "disabled";
+};
+
+&mdss_dsi {
+	hw-config = "single_dsi";
+};
+
+&mdss_dsi0 {
+	qcom,dsi-pref-prim-pan = <&dsi_tianma_otm1901a_vid >;
+};
+
+&dsi_tianma_ft8716_vid {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <255>;
+	qcom,cont-splash-enabled;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+};
+
+&dsi_boe_td4300_vid {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <255>;
+	qcom,cont-splash-enabled;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply>;
+ };
+ 
+&dsi_tianma_otm1901a_vid {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_pwm";
+	qcom,mdss-dsi-bl-pmic-pwm-frequency = <100>;
+	qcom,mdss-dsi-bl-pmic-bank-select = <3>;
+	qcom,mdss-dsi-pwm-gpio = <&pmi8994_mpps 1 0>;
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <4095>;
+	qcom,cont-splash-enabled;
+};
+
+&dsi_dual_sharp_video {
+	qcom,cont-splash-disabled;
+};
+
+&dsi_samsung_1080_cmd {
+	qcom,mdss-dsi-bl-pmic-control-type = "bl_ctrl_dcs";
+	qcom,mdss-dsi-bl-min-level = <1>;
+	qcom,mdss-dsi-bl-max-level = <255>;
+	qcom,cont-splash-enabled;
+	qcom,panel-supply-entries = <&dsi_panel_pwr_supply_no_labibb>;
+};
+
+&dsi_dual_nt35597_video {
+	qcom,cont-splash-disabled;
+};
+
+&dsi_dual_nt35597_cmd {
+	qcom,cont-splash-enabled;
+};
