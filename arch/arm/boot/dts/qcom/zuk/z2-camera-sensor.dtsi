@@ -7,18 +7,18 @@
 	qcom,cam-vreg-op-mode = <0 100000>;
 	gpios = <&tlmm 13 0>,
 		<&tlmm 26 0>;
+	/delete-property/ qcom,gpio-standby;
 	qcom,gpio-req-tbl-num = <0 1>;
 	qcom,gpio-req-tbl-flags = <1 0>;
 	qcom,gpio-req-tbl-label = "CAMIF_MCLK0", "CAM_RESET0";
-	
 	/delete-property/ clocks;
-	/delete-property/ clocks-names;
+	/delete-property/ clock-names;
 	/delete-property/ qcom,clock-rates;
 }; 
 
 &cci {
-	/delete-property/ qcom,actuator@1;
-	/delete-property/ qcom,ois@0;
+	/delete-node/ qcom,actuator@1;
+	/delete-node/ qcom,ois@0;
 	qcom,camera@0 {
 		/delete-property/ qcom,ois-src;
 		cam_vdig-supply = <&pm8994_l3>;

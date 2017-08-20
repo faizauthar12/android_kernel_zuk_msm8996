@@ -18,7 +18,6 @@
 };
 
 &soc {
-	/delete-node/ qcom,hdmi_tx@9a0000;
 	/delete-node/ spi@75BA000;
 
 	i2c_1: i2c@7575000 {/* BLSP1 QUP1 */
@@ -218,6 +217,19 @@
 			};
 		};
 	};
+	max86x00_mux {
+		default {
+			mux {
+				pins = "gpio123";
+				function = "gpio";
+			};
+			config {
+				pins = "gpio123";
+				drive-strength = <0x2>;
+				bias-pull-up;
+			};
+		};
+	};
 };
 
 &ts_active {
@@ -297,16 +309,7 @@
 };
 
 &pmi8994_gpios {
-	gpio@cd00 {
-		status = "disabled";
-		/delete-property/ qcom,mode;
-		/delete-property/ qcom,output-type;
-		/delete-property/ qcom,invert;
-		/delete-property/ qcom,vin-sel;
-		/delete-property/ qcom,src-sel;
-		/delete-property/ qcom,out-strength;
-		/delete-property/ qcom,master-en;
-	};
+	/delete-node/ gpio@cd00;
 	gpio@d500 { /* GPIO 22 - lcd_bklt_reg_en */
 		qcom,mode = <1>;	/* DIGITAL OUT */
 		qcom,output-type = <0>;		/* CMOS logic */

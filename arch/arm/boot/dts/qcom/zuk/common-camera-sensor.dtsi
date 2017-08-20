@@ -14,6 +14,10 @@
 	/delete-property/ qcom,clock-rates;
 };
 
+&cci {
+	/delete-node/ qcom,camera@1;
+};
+
 &cam_sensor_rear_active {
 	mux {
 		pins = "gpio30", "gpio27";
@@ -36,7 +40,7 @@
 	mux {
 		pins = "gpio23","gpio25";
 	};
-	conifg {
+	config {
 		pins = "gpio23","gpio25";
 	};
 };
