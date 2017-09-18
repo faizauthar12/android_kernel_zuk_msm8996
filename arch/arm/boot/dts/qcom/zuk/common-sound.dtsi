@@ -13,7 +13,8 @@
 			"AMIC3", "MIC BIAS3", 
 			"MIC BIAS3", "Analog Mic3", 
 			"MIC BIAS3", "Handset Mic", 
-			"SpkrLeft IN", "SPK1 OUT";
+			"SpkrLeft IN", "SPK1 OUT",
+			"SpkrRight IN", "SPK2 OUT";
 		asoc-cpu = <&dai_pri_auxpcm>, <&dai_sec_auxpcm>, <&dai_hdmi>, <&dai_mi2s>, <&dai_mi2s_quat>,
 				<&sb_0_rx>, <&sb_0_tx>, <&sb_1_rx>, <&sb_1_tx>,
 				<&sb_2_rx>, <&sb_2_tx>, <&sb_3_rx>, <&sb_3_tx>,

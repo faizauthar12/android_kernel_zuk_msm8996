@@ -8,6 +8,7 @@
 #include "common-sound.dtsi"
 #include "common-usb.dtsi"
 #include "common-vibration.dtsi"
+
 / {
 	aliases {
 		i2c1 = &i2c_1;
@@ -308,8 +309,9 @@
 	qcom,spkr-sd-n-gpio = <&pmi8994_gpios 3 0>;
 };
 
-&pmi8994_gpios {
-	/delete-node/ gpio@cd00;
+&pm8994_gpios {
+    /delete-node/ gpio@cd00;
+    
 	gpio@d500 { /* GPIO 22 - lcd_bklt_reg_en */
 		qcom,mode = <1>;	/* DIGITAL OUT */
 		qcom,output-type = <0>;		/* CMOS logic */
@@ -320,10 +322,6 @@
 		qcom,master-en = <1>;	/* ENABLE GPIO */
 		status = "okay";
 	};
-	gpio@c900 { /* GPIO 10 */
-		qcom,src-sel = <0>;             /* GPIO */
-		qcom,invert = <1>;              /* Invert */
-	};
 };
 
 &pmi8994_mpps {
@@ -331,6 +329,7 @@
 		reg = <0xa000 0x100>;
 		qcom,pin-num = <1>;
 		qcom,invert = <0>;
+        qcom,vin-sel = <0>;
 	};
 };
 
@@ -365,4 +364,11 @@
 
 &pm8994_rtc {
 	qcom,qpnp-rtc-alarm-pwrup = <1>;
+};
+
+&pmi8994_gpios {
+    gpio@c900 {
+        qcom,src-sel = <0>;
+        qcom,invert = <1>;
+    };
 };

@@ -118,8 +118,6 @@
 		cc_logic@01 {
 			cc_logic,function-switch-gpio1 = <&tlmm 79 0x00>;
 			cc_logic,function-switch-gpio10 = <&tlmm 81 0x00>;
-			cc_logic,function-switch-gpio2 = <&tlmm 33 0x00>;
-			cc_logic,bypass-power-control = <&pm8994_gpios 10 0x00>;
 		};
 
 		drv2605_haptics@5a{
@@ -218,5 +216,10 @@
 };
 
 &pmi8994_fg {
-	qcom,fg-iterm-ma = <150>;
+	qcom,fg-iterm-ma = <125>;
+};
+
+&dmss_dsi0 {
+    qcom,platform-te-gpio = <&tlmm 10 0>;
+    qcom,platform-enable-gpio = <&tlmm 76 0>;
 };

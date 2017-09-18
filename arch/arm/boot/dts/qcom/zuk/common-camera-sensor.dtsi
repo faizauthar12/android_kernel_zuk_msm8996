@@ -1,8 +1,3 @@
-&led_flash0 {
-	qcom,flash-source = <&pmi8994_flash0>;
-	qcom,torch-source = <&pmi8994_torch0>;
-};
-
 &eeprom1 {
 	cam_vana-supply = <&pm8994_l17>;
 	qcom,cam-vreg-min-voltage = <1200000 0 2800000>;
@@ -16,6 +11,18 @@
 
 &cci {
 	/delete-node/ qcom,camera@1;
+	
+	qcom,camera@2 {
+		qcom,mount-angle = <270>;
+		/delete-property/ qcom,actuator-src;
+		cam_vana-supply = <&pm8994_l17>;
+		qcom,cam-vreg-min-voltage = <1200000 0 2800000>;
+		qcom,cam-vreg-max-voltage = <1200000 0 2800000>;
+		gpios = <&tlmm 15 0>,
+			<&tlmm 23 0>,
+			<&tlmm 25 0>;
+		/delete-property/ qcom,clock-rates;
+	};
 };
 
 &cam_sensor_rear_active {
@@ -52,10 +59,6 @@
 	config {
 		pins = "gpio23","gpio25";
 	};
-};
-
-&pmi8994_flash0 {
-	qcom,current = <800>;
 };
 
 &pmi8994_flash1 {

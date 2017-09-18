@@ -4,7 +4,6 @@
 
 #include "common.dtsi"
 #include "z2-camera-sensor.dtsi"
-
 &usb3 {
 	maximum-speed = "high-speed";
 };
@@ -89,11 +88,11 @@
 };
 
 &pmi8994_fg {
-	qcom,fg-iterm-ma = <150>;
+	qcom,fg-iterm-ma = <125>;
 };
 
 &ibb_regulator {
 	qcom,qpnp-ibb-init-voltage = <5000000>;
-	qcom,qpnp-ibb-init-amoled-voltage = <4000000>;
+	qcom,qpnp-lab-init-amoled-voltage = <4600000>;
 	qcom,qpnp-ibb-init-lcd-voltage = <5000000>;
 };
