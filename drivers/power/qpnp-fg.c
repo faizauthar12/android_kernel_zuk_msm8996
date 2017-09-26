@@ -237,18 +237,25 @@ enum fg_mem_data_index {
 
 static struct fg_mem_setting settings[FG_MEM_SETTING_MAX] = {
 	/*       ID                    Address, Offset, Value*/
-	SETTING(SOFT_COLD,       0x454,   0,      100),
-	SETTING(SOFT_HOT,        0x454,   1,      400),
-	SETTING(HARD_COLD,       0x454,   2,      50),
-	SETTING(HARD_HOT,        0x454,   3,      450),
+#ifdef CONFIG_MACH_ZUK_Z2_PLUS
+	SETTING(SOFT_COLD,       0x454,   0,      170),
+	SETTING(SOFT_HOT,        0x454,   1,      470),
+	SETTING(HARD_COLD,       0x454,   2,      20),
+	SETTING(HARD_HOT,        0x454,   3,      520),
+#else
+	SETTING(SOFT_COLD,       0x454,   0,      160),
+	SETTING(SOFT_HOT,        0x454,   1,      460),
+	SETTING(HARD_COLD,       0x454,   2,      10),
+	SETTING(HARD_HOT,        0x454,   3,      510),
+#endif
 	SETTING(RESUME_SOC,      0x45C,   1,      0),
 	SETTING(BCL_LM_THRESHOLD, 0x47C,   2,      50),
 	SETTING(BCL_MH_THRESHOLD, 0x47C,   3,      752),
 	SETTING(TERM_CURRENT,	 0x40C,   2,      250),
 	SETTING(CHG_TERM_CURRENT, 0x4F8,   2,      250),
-	SETTING(IRQ_VOLT_EMPTY,	 0x458,   3,      3100),
-	SETTING(CUTOFF_VOLTAGE,	 0x40C,   0,      3200),
-	SETTING(VBAT_EST_DIFF,	 0x000,   0,      30),
+	SETTING(IRQ_VOLT_EMPTY,	 0x458,   3,      3000),
+	SETTING(CUTOFF_VOLTAGE,	 0x40C,   0,      3400),
+	SETTING(VBAT_EST_DIFF,	 0x000,   0,      200),
 	SETTING(DELTA_SOC,	 0x450,   3,      1),
 	SETTING(BATT_LOW,	 0x458,   0,      4200),
 	SETTING(THERM_DELAY,	 0x4AC,   3,      0),
@@ -632,6 +639,8 @@ struct fg_chip {
 	struct delayed_work	check_sanity_work;
 	struct fg_wakeup_source	sanity_wakeup_source;
 	u8			last_beat_count;
+	ktime_t 		soc_kt;
+	u8	 		is_op_soc;
 	/* Batt_info restore */
 	int			batt_info[BATT_INFO_MAX];
 	int			batt_info_id;
@@ -2238,10 +2247,79 @@ static int get_monotonic_soc_raw(struct fg_chip *chip)
 }
 
 #define EMPTY_CAPACITY		0
-#define DEFAULT_CAPACITY	50
+#define DEFAULT_CAPACITY	65
 #define MISSING_CAPACITY	100
 #define FULL_CAPACITY		100
 #define FULL_SOC_RAW		0xFF
+
+static int bound_soc(int soc)
+{
+        soc = max(0, soc);
+        soc = min(100, soc);
+
+        return soc;
+}
+
+#define LENUK_OP_FIR_SOC		60
+#define LENUK_OP_SEC_SOC		85
+#define LENUK_SOC_CHANGE_MS		25000
+static int set_soc_remap_point(struct fg_chip *chip, int soc)
+{
+	int mapped_soc = 0;
+	if (!chip->is_op_soc) {
+		chip->soc_kt = ktime_get_boottime();
+		mapped_soc = soc;
+		chip->is_op_soc = 1;
+	} else {
+		ktime_t now_kt, delta_kt;
+		int delta_ms;
+		now_kt = ktime_get_boottime();
+		delta_kt = ktime_sub(now_kt, chip->soc_kt);
+		delta_ms = (int)div64_s64(ktime_to_ns(delta_kt), 1000000);
+		if (delta_ms <= LENUK_SOC_CHANGE_MS) {
+			if (chip->status == POWER_SUPPLY_STATUS_CHARGING)
+				mapped_soc = soc;
+			else
+				mapped_soc = soc + 1;
+		}else {
+			if (chip->status == POWER_SUPPLY_STATUS_CHARGING)
+				mapped_soc = soc + 1;
+			else
+				mapped_soc = soc;
+		}
+	}
+
+	return mapped_soc;
+}
+static int soc_remap_process(struct fg_chip *chip, int soc)
+{
+	int maped_soc = 0;
+	switch(soc){
+	case LENUK_OP_FIR_SOC :
+		maped_soc = set_soc_remap_point(chip,soc);
+		break;
+	case LENUK_OP_SEC_SOC :
+		maped_soc = set_soc_remap_point(chip,soc) + 1;
+                break;
+	default:
+		chip->is_op_soc = 0;
+		if(soc >= 61 && soc <= 84 )
+			maped_soc = soc + 1;
+		else if(soc >= 86 && soc <= 100)
+			maped_soc = bound_soc(soc + 2);
+		else
+			maped_soc = soc;
+	}
+	pr_info("pre_map_soc is %d,post_map_soc is %d\n",soc,maped_soc);
+	return maped_soc;
+}
+static int soc_show_op(struct fg_chip *chip, int msoc)
+{
+	int soc = DIV_ROUND_CLOSEST((msoc - 1) * (FULL_CAPACITY - 2),
+                        FULL_SOC_RAW - 2) + 1;
+	return soc_remap_process(chip, soc);
+}
+
 static int get_prop_capacity(struct fg_chip *chip)
 {
 	int msoc, rc;
@@ -2250,9 +2328,7 @@ static int get_prop_capacity(struct fg_chip *chip)
 	if (chip->use_last_soc && chip->last_soc) {
 		if (chip->last_soc == FULL_SOC_RAW)
 			return FULL_CAPACITY;
-		return DIV_ROUND_CLOSEST((chip->last_soc - 1) *
-				(FULL_CAPACITY - 2),
-				FULL_SOC_RAW - 2) + 1;
+		return soc_show_op(chip, msoc);
 	}
 
 	if (chip->battery_missing)
@@ -2282,9 +2358,7 @@ static int get_prop_capacity(struct fg_chip *chip)
 			}
 
 			if (!vbatt_low_sts)
-				return DIV_ROUND_CLOSEST((chip->last_soc - 1) *
-						(FULL_CAPACITY - 2),
-						FULL_SOC_RAW - 2) + 1;
+				return soc_show_op(chip, msoc);
 			else
 				return EMPTY_CAPACITY;
 		} else {
@@ -2294,8 +2368,7 @@ static int get_prop_capacity(struct fg_chip *chip)
 		return FULL_CAPACITY;
 	}
 
-	return DIV_ROUND_CLOSEST((msoc - 1) * (FULL_CAPACITY - 2),
-			FULL_SOC_RAW - 2) + 1;
+	return soc_show_op(chip, msoc);
 }
 
 #define HIGH_BIAS	3
@@ -8894,6 +8967,7 @@ static int fg_probe(struct spmi_device *spmi)
 		pr_err("batt failed to register rc = %d\n", rc);
 		goto of_init_fail;
 	}
+		chip->is_op_soc = 0;
 	chip->power_supply_registered = true;
 	/*
 	 * Just initialize the batt_psy_name here. Power supply
