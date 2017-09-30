@@ -115,8 +115,7 @@
 };
 
 &usb3 {
-	//vbus_dwc3-supply = <&smbcharger_charger_otg>;
-	//vbus_dwc3-supply = <&usb_otg_switch>;
+	/delete-property/ vbus_dwc3-supply;
 };
 
 &qusb_phy0 {

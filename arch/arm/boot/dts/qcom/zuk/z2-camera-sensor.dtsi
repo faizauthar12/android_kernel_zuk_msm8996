@@ -35,7 +35,7 @@
 		qcom,cam-vreg-max-voltage = <1000000 0 2800000>;
 		qcom,cam-vreg-op-mode = <105000 0 100000>;
 		gpios = <&tlmm 13 0>, <&tlmm 26 0>;
-		/delete-property/qcom,gpio-standby;
+		/delete-property/ qcom,gpio-standby;
 		qcom,gpio-req-tbl-num = <0 1>;
 		qcom,gpio-req-tbl-flags = <1 0>;
 		qcom,gpio-req-tbl-label = "CAMIF_MCLK0", "CAM_RESET0";
