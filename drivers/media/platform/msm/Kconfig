@@ -44,8 +44,21 @@ config MSMB_CAMERA_DEBUG
 	---help---
 	  Enable printk() debug for msm camera 2.0
 
+menuconfig ZUK_CAMERA
+	bool "Zuk Camera variant of the camera stack"
+	depends on ARCH_MSM && VIDEO_V4L2 && I2C && MSMB_CAMERA
+	default n
+	---help---
+	  Enable the old Zuk camera code
+
+
 if MSMB_CAMERA
+if !ZUK_CAMERA
 source "drivers/media/platform/msm/camera_v2/Kconfig"
+endif
+if ZUK_CAMERA
+source "drivers/media/platform/msm/camera_v2z/Kconfig"
+endif
 endif # MSMB_CAMERA
 
 source "drivers/media/platform/msm/ais/Kconfig"

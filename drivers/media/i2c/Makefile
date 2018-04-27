@@ -34,10 +34,17 @@ ccflags-y += -Idrivers/media/platform/msm/ais/common
 ccflags-y += -Idrivers/media/platform/msm/ais/sensor/io
 ccflags-y += -Idrivers/media/platform/msm/ais/sensor/cci
 else
+ifneq ($(CONFIG_ZUK_CAMERA),y)
 ccflags-y += -Idrivers/media/platform/msm/camera_v2
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/common
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/io
 ccflags-y += -Idrivers/media/platform/msm/camera_v2/sensor/cci
+else
+ccflags-y += -Idrivers/media/platform/msm/camera_v2z
+ccflags-y += -Idrivers/media/platform/msm/camera_v2z/common
+ccflags-y += -Idrivers/media/platform/msm/camera_v2z/sensor/io
+ccflags-y += -Idrivers/media/platform/msm/camera_v2z/sensor/cci
+endif
 endif
 obj-$(CONFIG_VIDEO_ADV7481) += adv7481.o
 obj-$(CONFIG_VIDEO_AD9389B) += ad9389b.o
